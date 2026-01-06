@@ -19,49 +19,49 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // ✅ Load CORS origins from ENV
-    @Value("${CORS_ALLOWED_ORIGINS}")
-    private String corsAllowedOrigins;
+    // ✅ Same idea as your friend's `frontend.url`
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                // ❌ Disable CSRF (REST API)
+                // REST API → CSRF disabled
                 .csrf(csrf -> csrf.disable())
 
-                // ✅ Enable CORS
+                // Enable CORS
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // ✅ Authorization rules
+                // Authorization rules
                 .authorizeHttpRequests(auth -> auth
 
-                        // 🔓 AUTH APIs
+                        // AUTH
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // 🔓 TICKET APIs (public ticket creation/view)
+                        // TICKETS (public)
                         .requestMatchers(HttpMethod.POST, "/api/tickets").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tickets/**").permitAll()
 
-                        // 🔓 ROLE APIs (currently open — secure later with JWT)
+                        // ROLE APIs (open for now)
                         .requestMatchers("/api/admin/**").permitAll()
                         .requestMatchers("/api/agent/**").permitAll()
                         .requestMatchers("/api/user/**").permitAll()
 
-                        // 🔐 Everything else requires authentication
+                        // Everything else
                         .anyRequest().authenticated()
                 );
 
         return http.build();
     }
 
-    // ✅ Password Encoder (BCrypt)
+    // Password encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ Centralized CORS Configuration
+    // CORS configuration (frontend.url)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
@@ -69,20 +69,14 @@ public class SecurityConfig {
 
         config.setAllowCredentials(true);
 
-        // Convert "http://a,http://b" → List
-        config.setAllowedOrigins(
-                List.of(corsAllowedOrigins.split(","))
-        );
-
-        config.setAllowedHeaders(List.of("*"));
+        // Convert "url1,url2" → List
+        config.setAllowedOrigins(List.of(frontendUrl.split(",")));
 
         config.setAllowedMethods(List.of(
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "OPTIONS"
+                "GET", "POST", "PUT", "DELETE", "OPTIONS"
         ));
+
+        config.setAllowedHeaders(List.of("*"));
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
