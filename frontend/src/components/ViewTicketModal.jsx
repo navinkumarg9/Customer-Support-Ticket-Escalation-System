@@ -4,7 +4,7 @@ export default function ViewTicketModal({ ticketId, onClose }) {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/user/ticket/${ticketId}`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/user/ticket/${ticketId}`)
       .then((res) => {
         if (!res.ok) throw new Error("Not authorized or ticket not found");
         return res.json();

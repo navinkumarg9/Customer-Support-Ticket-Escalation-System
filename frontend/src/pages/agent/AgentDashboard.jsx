@@ -12,7 +12,7 @@ export default function AgentDashboard() {
   useEffect(() => {
     if (!agent?.id) return;
 
-    fetch(`http://localhost:8080/api/agent/ticket/${agent.id}`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/agent/ticket/${agent.id}`)
       .then(res => {
         if (!res.ok) throw new Error("Failed to load ticket");
         return res.json();
@@ -33,7 +33,7 @@ export default function AgentDashboard() {
 
     try {
       const res = await fetch(
-        `http://localhost:8080/api/agent/start/${ticket.id}?agentId=${agent.id}`,
+        `${import.meta.env.VITE_API_URL}/api/agent/start/${ticket.id}?agentId=${agent.id}`,
         { method: "POST" }
       );
 
@@ -60,7 +60,7 @@ export default function AgentDashboard() {
 
     try {
       const res = await fetch(
-        `http://localhost:8080/api/agent/resolve/${ticket.id}`,
+        `${import.meta.env.VITE_API_URL}/api/agent/resolve/${ticket.id}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
