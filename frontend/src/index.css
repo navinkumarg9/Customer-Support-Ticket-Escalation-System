@@ -1,0 +1,24 @@
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Root container */
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+/* Links */
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #535bf2;
+}
