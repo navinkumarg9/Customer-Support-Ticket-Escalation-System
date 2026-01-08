@@ -2,18 +2,19 @@ package com.example.helpdesk.scheduler;
 
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Component
 public class SlaUtil {
 
-    public LocalDateTime calculateSla(LocalDateTime from, String priority) {
+    public Instant calculateSla(Instant from, String priority) {
 
         return switch (priority.toUpperCase()) {
-            case "HIGH" -> from.plusHours(2);
-            case "MEDIUM" -> from.plusHours(4);
-            case "LOW" -> from.plusHours(8);
-            default -> from.plusHours(4);
+            case "HIGH" -> from.plus(2, ChronoUnit.HOURS);
+            case "MEDIUM" -> from.plus(4, ChronoUnit.HOURS);
+            case "LOW" -> from.plus(8, ChronoUnit.HOURS);
+            default -> from.plus(4, ChronoUnit.HOURS);
         };
     }
 }

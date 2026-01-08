@@ -2,7 +2,7 @@ package com.example.helpdesk.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "tickets")
@@ -14,9 +14,8 @@ public class Ticket {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String ticketId;   // TKT-101
+    private String ticketId;
 
-    // ✅ FIX: allow large issue descriptions
     @Lob
     @Column(columnDefinition = "LONGTEXT", nullable = false)
     private String issue;
@@ -25,7 +24,7 @@ public class Ticket {
     private String priority;
 
     @Column(nullable = false)
-    private String status; // OPEN, PENDING, IN_PROGRESS, ESCALATED, RESOLVED
+    private String status;
 
     @Column(nullable = false)
     private Long userId;
@@ -33,9 +32,9 @@ public class Ticket {
     private Long agentId;
     private String agentName;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime slaDeadline;
-    private LocalDateTime resolvedAt;
+    private Instant createdAt;
+    private Instant slaDeadline;
+    private Instant resolvedAt;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")

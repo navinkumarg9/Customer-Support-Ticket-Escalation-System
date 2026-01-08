@@ -20,7 +20,7 @@ export default function CreateTicketModal({ onClose, onTicketCreated }) {
   setLoading(true);
 
   try {
-    const res = await fetch("http://localhost:8080/api/tickets", {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/tickets`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

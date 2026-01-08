@@ -1,34 +1,20 @@
 import { useEffect, useState } from "react";
-
-function getRemaining(deadline, status) {
-  if (status === "RESOLVED") {
-    return { text: "—", expired: false };
-  }
-
-  if (!deadline) return { text: "—", expired: false };
-
-  const diff = new Date(deadline) - new Date();
-  if (diff <= 0) return { text: "Expired", expired: true };
-
-  const h = Math.floor(diff / (1000 * 60 * 60));
-  const m = Math.floor((diff / (1000 * 60)) % 60);
-  return { text: `${h}h ${m}m`, expired: false };
-}
+import { formatIST, getRemainingTimeUTC } from "../../utils/time";
 
 export default function TicketTable({
-  tickets = [],              // ✅ SAFE DEFAULT
-  activeFilter = "ALL",       // ✅ SAFE DEFAULT (FIX)
+  tickets = [],
+  activeFilter = "ALL",
   onAssign,
   onView,
 }) {
   const [, forceUpdate] = useState(0);
 
+  // 🔁 Refresh remaining SLA every minute
   useEffect(() => {
     const timer = setInterval(() => forceUpdate(v => v + 1), 60000);
     return () => clearInterval(timer);
   }, []);
 
-  // ✅ SAFE EMPTY MESSAGE
   const getEmptyMessage = () => {
     if (!activeFilter || activeFilter === "ALL") {
       return "No tickets available";
@@ -75,7 +61,7 @@ export default function TicketTable({
               <th>Issue</th>
               <th>Priority</th>
               <th>Status</th>
-              <th>SLA</th>
+              <th>SLA Deadline (IST)</th>
               <th>Remaining</th>
               <th>Action</th>
             </tr>
@@ -90,7 +76,7 @@ export default function TicketTable({
               </tr>
             ) : (
               tickets.map(t => {
-                const sla = getRemaining(t.slaDeadline, t.status);
+                const sla = getRemainingTimeUTC(t.slaDeadline);
                 const escalated = t.status === "ESCALATED" || sla.expired;
                 const displayStatus = escalated ? "ESCALATED" : t.status;
 
@@ -119,8 +105,10 @@ export default function TicketTable({
                       </span>
                     </td>
 
-                    <td>{t.slaDeadline ? new Date(t.slaDeadline).toLocaleString() : "—"}</td>
+                    {/* ✅ UTC → IST DISPLAY */}
+                    <td>{formatIST(t.slaDeadline)}</td>
 
+                    {/* ✅ SLA BASED ON UTC */}
                     <td className={sla.expired ? "expired" : "active"}>
                       {t.status === "RESOLVED" ? "—" : sla.text}
                     </td>
@@ -143,7 +131,6 @@ export default function TicketTable({
           overflow: hidden;
         }
 
-        /* ✅ ONLY TABLE SCROLLS */
         .table-scroll {
           max-height: 60vh;
           overflow-y: auto;
@@ -160,8 +147,6 @@ export default function TicketTable({
           font-size: 13px;
           text-transform: uppercase;
           color: #475569;
-
-          /* ✅ STICKY HEADER */
           position: sticky;
           top: 0;
           z-index: 5;
@@ -199,12 +184,12 @@ export default function TicketTable({
         .chip.medium { background: #fef3c7; color: #92400e; }
         .chip.low { background: #dcfce7; color: #166534; }
 
-        .status{
+        .status {
           font-size: 12px;
-          font-weight: 550;          
+          font-weight: 550;
         }
         .status.open { color: #2563eb; }
-        .status.pending { color:  #f59e0b; }
+        .status.pending { color: #f59e0b; }
         .status.in-progress { color: #7c3aed; }
         .status.resolved { color: #16a34a; }
         .status.escalated { color: #dc2626; }
@@ -238,6 +223,7 @@ export default function TicketTable({
           color: white;
           cursor: pointer;
         }
+
         button:hover {
           transform: translateY(-1px);
           box-shadow: 0 8px 20px rgba(0,0,0,0.2);
@@ -246,16 +232,9 @@ export default function TicketTable({
         .view-btn {
           background: linear-gradient(135deg, #0ea5e9, #0284c7);
         }
-        .view-btn:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-        }
+
         .reassign-btn {
           background: linear-gradient(135deg, #6366f1, #4f46e5);
-        }
-        .reassign-btn:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
 
         .half-line {
@@ -264,8 +243,6 @@ export default function TicketTable({
           overflow: hidden;
           text-overflow: ellipsis;
         }
-        
-
       `}</style>
     </div>
   );

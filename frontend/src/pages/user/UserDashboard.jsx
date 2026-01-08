@@ -19,7 +19,7 @@ export default function UserDashboard() {
   const loadTickets = async (pageNumber = page) => {
     try {
       const res = await fetch(
-        `http://localhost:8080/api/tickets/my/${user.id}?page=${pageNumber}&size=10`
+        `${import.meta.env.VITE_API_URL}/api/tickets/my/${user.id}?page=${pageNumber}&size=10`
       );
 
       if (!res.ok) throw new Error("Failed to load tickets");

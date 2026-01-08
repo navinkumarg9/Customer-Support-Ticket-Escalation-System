@@ -6,7 +6,7 @@ import com.example.helpdesk.repository.TicketRepository;
 import com.example.helpdesk.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -21,17 +21,13 @@ public class AgentService {
         this.userRepository = userRepository;
     }
 
-    // 🔹 Get agent's active ticket (ONE at a time)
     public Ticket getAssignedTicket(Long agentId) {
-
         return ticketRepository.findByAgentIdAndStatusIn(
                 agentId,
                 List.of("PENDING", "IN_PROGRESS")
         ).stream().findFirst().orElse(null);
     }
 
-
-    // 🔹 Agent starts work
     public Ticket startWork(Long ticketId, Long agentId) {
 
         Ticket ticket = ticketRepository.findById(ticketId)
@@ -49,7 +45,6 @@ public class AgentService {
         return ticketRepository.save(ticket);
     }
 
-    // 🔹 Resolve ticket
     public Ticket resolveTicket(Long ticketId, Long agentId, String note) {
 
         if (note == null || note.isBlank()) {
@@ -73,10 +68,9 @@ public class AgentService {
         ticket.setAgentId(agent.getId());
         ticket.setAgentName(agent.getFullName());
         ticket.setStatus("RESOLVED");
-        ticket.setResolvedAt(LocalDateTime.now());
+        ticket.setResolvedAt(Instant.now()); // ✅ UTC
         ticket.setResolutionNote(note);
 
         return ticketRepository.save(ticket);
     }
-
 }

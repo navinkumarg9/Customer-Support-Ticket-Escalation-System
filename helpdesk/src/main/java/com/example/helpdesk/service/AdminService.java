@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,9 +29,7 @@ public class AdminService {
         this.slaUtil = slaUtil;
     }
 
-    // 🔹 Agent approval
     public void approveAgent(String email) {
-
         User agent = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Agent not found"));
 
@@ -43,31 +41,20 @@ public class AdminService {
         userRepository.save(agent);
     }
 
-    // 🔹 Reject agent
     public void rejectAgent(String email) {
-
         User agent = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Agent not found"));
-
         userRepository.delete(agent);
     }
 
-    // ✅ ALL TICKETS (PAGINATED)
     public Page<Ticket> getAllTickets(int page, int size) {
-        return ticketRepository.findAll(
-                PageRequest.of(page, size)
-        );
+        return ticketRepository.findAll(PageRequest.of(page, size));
     }
 
-    // ✅ FILTER BY STATUS (PAGINATED)
     public Page<Ticket> getTicketsByStatus(String status, int page, int size) {
-        return ticketRepository.findByStatus(
-                status,
-                PageRequest.of(page, size)
-        );
+        return ticketRepository.findByStatus(status, PageRequest.of(page, size));
     }
 
-    // 🔹 Dashboard counts
     public Map<String, Long> getDashboardCounts() {
 
         Map<String, Long> counts = new HashMap<>();
@@ -81,7 +68,6 @@ public class AdminService {
         return counts;
     }
 
-    // 🔹 Agents with availability
     public List<Map<String, Object>> getAgentsWithAvailability() {
 
         List<User> agents = userRepository.findByRoleAndStatus("AGENT", "ACTIVE");
@@ -103,13 +89,11 @@ public class AdminService {
         }).toList();
     }
 
-    // 🔹 Assign / Reassign ticket
     public Ticket assignTicketToAgent(Long ticketId, Long agentId) {
 
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new RuntimeException("Ticket not found"));
 
-        // ✅ Only OPEN or ESCALATED allowed
         if (!List.of("OPEN", "ESCALATED").contains(ticket.getStatus())) {
             throw new RuntimeException("Ticket cannot be assigned");
         }
@@ -126,14 +110,12 @@ public class AdminService {
             throw new RuntimeException("Agent already busy");
         }
 
-        // 🔥 RESET STATE
         ticket.setAgentId(agentId);
         ticket.setAgentName(agent.getFullName());
         ticket.setStatus("PENDING");
         ticket.setEscalated(false);
 
-        // 🔥 RESTART SLA
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now(); // ✅ UTC
         ticket.setCreatedAt(now);
         ticket.setSlaDeadline(
                 slaUtil.calculateSla(now, ticket.getPriority())
@@ -162,5 +144,5 @@ public class AdminService {
 
         return data;
     }
-
 }
+

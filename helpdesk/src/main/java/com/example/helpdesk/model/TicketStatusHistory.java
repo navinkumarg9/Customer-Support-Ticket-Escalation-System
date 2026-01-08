@@ -3,7 +3,7 @@ package com.example.helpdesk.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "ticket_status_history")
@@ -24,5 +24,5 @@ public class TicketStatusHistory {
     private String newStatus;
 
     @Column(nullable = false)
-    private LocalDateTime changedAt;
+    private Instant changedAt;
 }

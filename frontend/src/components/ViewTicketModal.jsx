@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { formatIST } from "../utils/time"; // ✅ UTC → IST formatter
 
 export default function ViewTicketModal({ ticketId, onClose }) {
   const [data, setData] = useState(null);
@@ -67,7 +68,6 @@ export default function ViewTicketModal({ ticketId, onClose }) {
           font-size: 14px;
           color: #334155;
 
-          /* 🔑 FIX FOR OVERFLOW */
           white-space: pre-wrap;
           word-break: break-word;
           overflow-wrap: anywhere;
@@ -113,10 +113,25 @@ export default function ViewTicketModal({ ticketId, onClose }) {
           <div className="grid">
             <div><b>Ticket ID:</b> {data.ticketId}</div>
             <div><b>User ID:</b> {data.userId}</div>
-            <div><b>Created Time:</b> {new Date(data.createdAt).toLocaleString()}</div>
-            <div><b>Resolved Time:</b> {new Date(data.resolvedAt).toLocaleString()}</div>
+
+            {/* ✅ UTC → IST */}
+            <div>
+              <b>Created Time:</b>{" "}
+              {formatIST(data.createdAt)}
+            </div>
+
+            <div>
+              <b>Resolved Time:</b>{" "}
+              {data.resolvedAt ? formatIST(data.resolvedAt) : "—"}
+            </div>
+
             <div><b>Priority:</b> {data.priority}</div>
-            <div><b>Agent:</b> {data.agentName} (ID: {data.agentId})</div>
+            <div>
+              <b>Agent:</b>{" "}
+              {data.agentName
+                ? `${data.agentName} (ID: ${data.agentId})`
+                : "—"}
+            </div>
           </div>
 
           <div className="section">

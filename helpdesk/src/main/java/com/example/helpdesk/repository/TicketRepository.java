@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
@@ -14,7 +14,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     List<Ticket> findByStatus(String status);
 
-    // ✅ ADD THIS FOR ADMIN PAGINATION
     Page<Ticket> findAll(Pageable pageable);
 
     Page<Ticket> findByStatus(String status, Pageable pageable);
@@ -25,10 +24,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     long countByStatus(String status);
 
-    // 🔥 SLA escalation query
     List<Ticket> findBySlaDeadlineBeforeAndStatusNot(
-            LocalDateTime time,
+            Instant time,
             String status
     );
-    
 }

@@ -22,9 +22,9 @@ public class EmailService {
                 "Agent Name: " + agent.getFullName() +
                         "\nAgent Email: " + agent.getEmail() +
                         "\n\nApprove:" +
-                        "\nhttp://localhost:8080/api/admin/approve?email=" + agent.getEmail() +
+                        "\nhttps://helpdesk-deployment-latest.onrender.com/api/admin/approve?email=" + agent.getEmail() +
                         "\n\nReject:" +
-                        "\nhttp://localhost:8080/api/admin/reject?email=" + agent.getEmail();
+                        "\nhttps://helpdesk-deployment-latest.onrender.com/api/admin/reject?email=" + agent.getEmail();
 
         brevoEmailService.sendEmail(
                 ADMIN_EMAIL,

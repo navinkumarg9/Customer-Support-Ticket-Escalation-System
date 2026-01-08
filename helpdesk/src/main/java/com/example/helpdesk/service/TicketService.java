@@ -8,8 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.Instant;
 
 @Service
 public class TicketService {
@@ -26,7 +25,6 @@ public class TicketService {
 
     public Ticket createTicket(String issue, String priority, User user) {
 
-        // ✅ BACKEND SAFETY CHECK
         if (issue == null || issue.trim().isEmpty()) {
             throw new RuntimeException("Issue description is required");
         }
@@ -42,7 +40,7 @@ public class TicketService {
         ticket.setStatus("OPEN");
         ticket.setUserId(user.getId());
 
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now(); // ✅ UTC
         ticket.setCreatedAt(now);
         ticket.setSlaDeadline(
                 slaUtil.calculateSla(now, priority)
@@ -50,7 +48,6 @@ public class TicketService {
 
         return ticketRepository.save(ticket);
     }
-
 
     public Page<Ticket> getTicketsByUser(Long userId, int page, int size) {
         return ticketRepository.findByUserId(
@@ -80,7 +77,7 @@ public class TicketService {
                 .orElseThrow(() -> new RuntimeException("Ticket not found"));
 
         ticket.setStatus("RESOLVED");
-        ticket.setResolvedAt(LocalDateTime.now());
+        ticket.setResolvedAt(Instant.now()); // ✅ UTC
 
         return ticketRepository.save(ticket);
     }

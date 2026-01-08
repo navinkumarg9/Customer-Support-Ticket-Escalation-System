@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import TopBar from "../../components/TopBar";
+import { formatIST } from "../../utils/time"; // ✅ UTC → IST
 
 export default function AgentDashboard() {
   const agent = JSON.parse(localStorage.getItem("user"));
@@ -140,7 +141,6 @@ export default function AgentDashboard() {
           color: #334155;
         }
 
-        /* 🔥 HALF LINE UX FIX */
         .half-line {
           max-width: 420px;
           white-space: nowrap;
@@ -245,9 +245,7 @@ export default function AgentDashboard() {
               <span><b>Priority:</b> {ticket.priority}</span>
               <span>
                 <b>Created:</b>{" "}
-                {ticket.createdAt
-                  ? new Date(ticket.createdAt).toLocaleString()
-                  : "-"}
+                {ticket.createdAt ? formatIST(ticket.createdAt) : "—"}
               </span>
             </div>
 
